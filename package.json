@@ -20,8 +20,8 @@
   "build": "npm run build:css && react-scripts build",
   "test": "react-scripts test",
   "eject": "react-scripts eject",
-  "build:css": "tailwindcss -i ./src/index.css -o ./src/output.css",
-  "watch:css": "tailwindcss -i ./src/index.css -o ./src/output.css --watch"
+  "build:css": "npx tailwindcss -i ./src/index.css -o ./src/output.css",
+  "watch:css": "npx tailwindcss -i ./src/index.css -o ./src/output.css --watch"
 },
   "eslintConfig": {
     "extends": [

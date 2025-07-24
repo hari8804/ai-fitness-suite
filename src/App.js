@@ -153,7 +153,7 @@ const RestTimer = ({ seconds, onSkip }) => {
     return (
         <div className="fixed bottom-5 right-5 bg-slate-800 border border-slate-700 text-white rounded-2xl shadow-2xl p-6 w-64 z-50 transform transition-all animate-fade-in">
             <h3 className="font-bold text-lg mb-2 text-cyan-400">Rest Timer</h3>
-            <p className="text-5xl font-mono text-center mb-4">{mins}:{secs}</p>
+            <p className="text-5xl font-mono text-center mb-4">{mins}:${secs}</p>
             <button onClick={onSkip} className="w-full bg-slate-700 text-slate-200 font-bold py-2 rounded-lg hover:bg-slate-600">Skip</button>
         </div>
     );
@@ -176,15 +176,19 @@ export default function App() {
         if (options.isPlan) {
             try {
                 const newPlan = JSON.parse(response);
-                let planHtml = '';
-                for(const day in newPlan) {
+                
+                // This logic is refactored to be compliant with the no-loop-func rule
+                const planHtml = Object.keys(newPlan).map(day => {
                     const dayData = newPlan[day];
-                    planHtml += `<div class="mb-6"><h3 class="text-xl font-bold text-cyan-400 mb-2">${dayData.emoji || '💪'} ${day} - ${dayData.title}</h3>`;
                     const exercises = dayData.mainWorkout?.exercises || dayData.mainCircuit?.exercises || [];
-                    planHtml += '<ul class="list-disc list-inside text-slate-300">';
-                    exercises.forEach(ex => { planHtml += `<li><strong>${ex.name}:</strong> ${ex.sets} sets of ${ex.reps}, ${ex.rest} rest</li>`; });
-                    planHtml += '</ul></div>';
-                }
+                    const exercisesHtml = exercises.map(ex => `<li><strong>${ex.name}:</strong> ${ex.sets} sets of ${ex.reps}, ${ex.rest} rest</li>`).join('');
+                    
+                    return `<div class="mb-6">
+                                <h3 class="text-xl font-bold text-cyan-400 mb-2">${dayData.emoji || '💪'} ${day} - ${dayData.title}</h3>
+                                <ul class="list-disc list-inside text-slate-300">${exercisesHtml}</ul>
+                            </div>`;
+                }).join('');
+
                 const footer = <button onClick={() => { setWorkoutPlan(newPlan); setProgressLog({}); setActivePage('plan'); setModalState({isOpen: false}); }} className="bg-cyan-500 text-slate-900 font-bold py-2 px-6 rounded-lg shadow-md hover:bg-cyan-400">Use This Plan</button>;
                 setModalState({ isOpen: true, title, children: <div dangerouslySetInnerHTML={{ __html: planHtml }} />, footerContent: footer });
             } catch (e) {
